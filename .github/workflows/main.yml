@@ -33,6 +33,4 @@ jobs:
         echo Add other actions to build,
         echo test, and deploy your project.
     - name: ESLint Action
-      uses: hallee/eslint-action@1.0.1
-      with:
-        repo-token: ${{secrets.GITHUB_TOKEN}}
+      uses: stefanoeb/eslint-action@1.0.2
