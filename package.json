@@ -5,7 +5,9 @@
   "main": "dist/index.js",
   "scripts": {
     "test": "jest",
-    "build": "tsc --emitDeclarationOnly && babel src -d dist --extensions \".js,.jsx,.ts,.tsx\"",
+    "build": "npm run build-types && npm run build-src",
+    "build-types": "tsc --emitDeclarationOnly -p tsconfig.build.json",
+    "build-src": " babel src -d dist --extensions \".js,.jsx,.ts,.tsx\"",
     "lint": "eslint ./src --ext .js,.jsx,.ts,.tsx"
   },
   "repository": {
@@ -37,5 +39,8 @@
     "jest": "^25.3.0",
     "typescript": "^3.8.3"
   },
-  "dependencies": {}
+  "dependencies": {
+    "@babel/plugin-transform-runtime": "^7.9.0",
+    "whatwg-fetch": "^3.0.0"
+  }
 }

@@ -1,7 +1,3 @@
-const onFetch = (): boolean => {
-  console.log("fetching....");
-
-  return false;
-};
+import onFetch from "./onFetch";
 
 export default onFetch;
