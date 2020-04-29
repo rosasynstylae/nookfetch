@@ -13,7 +13,15 @@
   "plugins": [
     "@babel/proposal-class-properties",
     "@babel/proposal-object-rest-spread",
-    "@babel/plugin-transform-runtime"
-  ],
-  "ignore": ["./src/**/*.test.ts"]
+    "@babel/plugin-transform-runtime",
+    [
+      "module-resolver",
+      {
+        "alias": {
+          "@utils": "./utilities",
+          "@src": "./src"
+        }
+      }
+    ]
+  ]
 }

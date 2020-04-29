@@ -4,10 +4,10 @@
   "description": "A lightweight, flexible fetch wrapper written during the 2020 quarantine",
   "main": "dist/index.js",
   "scripts": {
-    "test": "jest",
+    "test": "jest --coverage",
     "build": "npm run build-types && npm run build-src",
     "build-types": "tsc --emitDeclarationOnly -p tsconfig.build.json",
-    "build-src": " babel src -d dist --extensions \".js,.jsx,.ts,.tsx\"",
+    "build-src": " babel src -d dist --extensions \".js,.jsx,.ts,.tsx\" --ignore \"**/*.test.ts\"",
     "lint": "eslint ./src --ext .js,.jsx,.ts,.tsx"
   },
   "repository": {
@@ -29,18 +29,18 @@
     "@babel/core": "^7.9.0",
     "@babel/plugin-proposal-class-properties": "^7.8.3",
     "@babel/plugin-proposal-object-rest-spread": "^7.9.5",
+    "@babel/plugin-transform-runtime": "^7.9.0",
     "@babel/preset-env": "^7.9.5",
     "@babel/preset-typescript": "^7.9.0",
     "@types/jest": "^25.2.1",
     "@typescript-eslint/eslint-plugin": "^2.28.0",
     "@typescript-eslint/parser": "^2.28.0",
     "babel-loader": "^8.1.0",
+    "babel-plugin-module-resolver": "^4.0.0",
     "eslint": "^6.8.0",
     "jest": "^25.3.0",
-    "typescript": "^3.8.3"
-  },
-  "dependencies": {
-    "@babel/plugin-transform-runtime": "^7.9.0",
+    "typescript": "^3.8.3",
     "whatwg-fetch": "^3.0.0"
-  }
+  },
+  "dependencies": {}
 }

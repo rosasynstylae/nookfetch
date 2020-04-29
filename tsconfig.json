@@ -10,5 +10,10 @@
     "noImplicitAny": true,
     "strictNullChecks": true,
     "alwaysStrict": true
+  },
+  "baseUrl": ".",
+  "paths": {
+    "@utils/*": ["utilities/*"],
+    "@src/*": ["src/*"]
   }
 }
