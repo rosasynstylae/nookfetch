@@ -12,7 +12,22 @@
   ],
   "settings": {
     "import/resolver": {
-      "babel-module": {}
+      "babel-module": {},
+      "alias": {
+        "map": [
+          ["@src", "./src"],
+          ["@utils", "./utilities"]
+        ],
+        "extensions": [".ts", ".js"]
+      }
     }
-  }
+  },
+  "overrides": [
+    {
+      "files": ["*test.ts"],
+      "rules": {
+        "@typescript-eslint/no-explicit-any": "off"
+      }
+    }
+  ]
 }

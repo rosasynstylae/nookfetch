@@ -7,8 +7,8 @@
     "test": "jest --coverage",
     "build": "npm run build-types && npm run build-src",
     "build-types": "tsc --emitDeclarationOnly -p tsconfig.build.json",
-    "build-src": " babel src -d dist --extensions \".js,.jsx,.ts,.tsx\" --ignore \"**/*.test.ts\"",
-    "lint": "eslint ./src --ext .js,.jsx,.ts,.tsx"
+    "build-src": " babel src -d dist --extensions \".js,.ts\" --ignore \"**/*.test.ts\"",
+    "lint": "eslint ./src/** --ext .js,.ts --max-warnings 0"
   },
   "repository": {
     "type": "git",
@@ -38,6 +38,9 @@
     "babel-loader": "^8.1.0",
     "babel-plugin-module-resolver": "^4.0.0",
     "eslint": "^6.8.0",
+    "eslint-import-resolver-alias": "^1.1.2",
+    "eslint-import-resolver-babel-module": "^5.1.2",
+    "eslint-plugin-import": "^2.20.2",
     "jest": "^25.3.0",
     "typescript": "^3.8.3",
     "whatwg-fetch": "^3.0.0"

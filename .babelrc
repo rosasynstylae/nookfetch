@@ -17,6 +17,7 @@
     [
       "module-resolver",
       {
+        "root": ["./src"],
         "alias": {
           "@utils": "./utilities",
           "@src": "./src"
