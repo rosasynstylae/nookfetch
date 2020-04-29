@@ -1,6 +1,6 @@
 {
   "name": "nookfetch",
-  "version": "1.0.1",
+  "version": "0.1.1",
   "description": "A lightweight, flexible fetch wrapper written during the 2020 quarantine",
   "main": "dist/index.js",
   "files": [
