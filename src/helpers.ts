@@ -3,7 +3,7 @@
  *
  * @param data - the data to process
  *
- * @return the body to pass to fetch
+ * @return the processed body to pass to fetch
  */
 const getBody = (data: object | FormData): string | FormData => {
   if (data instanceof FormData) {

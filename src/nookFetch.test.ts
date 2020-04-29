@@ -1,6 +1,6 @@
 import fetchSpy from "@utils/fetchMock";
 
-import onFetch from "./onFetch";
+import createNookFetch from "./nookFetch";
 
 const validation = (data: any): { data: { foo: string }; errors: string[] } => {
   if (typeof data === "object") {
@@ -16,24 +16,29 @@ const validation = (data: any): { data: { foo: string }; errors: string[] } => {
   return { data: { foo: "" }, errors: ["could not parse"] };
 };
 
-describe("onFetch", () => {
+describe("createNookFetch", () => {
   beforeEach(jest.clearAllMocks);
 
   it("should fetch and validate data", async () => {
-    const val = await onFetch(jest.fn())("/testing/123", validation);
+    const nookFetch = createNookFetch(jest.fn());
+    const val = await nookFetch("/testing/123", validation);
 
     expect(val).toEqual({ data: { foo: "bar" }, errors: [] });
   });
 
   it("should pass correct args to fetch if no options", async () => {
-    await onFetch(jest.fn())("/testing/123", validation);
+    const nookFetch = createNookFetch(jest.fn());
+    await nookFetch("/testing/123", validation);
 
     expect(fetchSpy).toHaveBeenCalledTimes(1);
     expect(fetchSpy).toHaveBeenNthCalledWith(1, "/testing/123", {});
   });
 
   it("should pass correct args to fetch if options are passed", async () => {
-    await onFetch(jest.fn())("/testing/123", validation, { method: "POST" });
+    const nookFetch = createNookFetch(jest.fn());
+    await nookFetch("/testing/123", validation, {
+      method: "POST"
+    });
 
     expect(fetchSpy).toHaveBeenCalledTimes(1);
     expect(fetchSpy).toHaveBeenNthCalledWith(1, "/testing/123", {
@@ -43,12 +48,12 @@ describe("onFetch", () => {
 
   it("should pass correct args to fetch if body is passed", async () => {
     const body = { foo: "bar" };
-    await onFetch(jest.fn())(
-      "/testing/123",
-      validation,
-      { method: "POST" },
+
+    const nookFetch = createNookFetch(jest.fn());
+    await nookFetch("/testing/123", validation, {
+      method: "POST",
       body
-    );
+    });
 
     expect(fetchSpy).toHaveBeenCalledTimes(1);
     expect(fetchSpy).toHaveBeenNthCalledWith(1, "/testing/123", {
@@ -60,12 +65,12 @@ describe("onFetch", () => {
   it("should pass correct args to fetch if formdata body is passed", async () => {
     const body = new FormData();
     body.append("username", "unicorns");
-    await onFetch(jest.fn())(
-      "/testing/123",
-      validation,
-      { method: "POST" },
+
+    const nookFetch = createNookFetch(jest.fn());
+    await nookFetch("/testing/123", validation, {
+      method: "POST",
       body
-    );
+    });
 
     expect(fetchSpy).toHaveBeenCalledTimes(1);
     expect(fetchSpy).toHaveBeenNthCalledWith(1, "/testing/123", {
@@ -81,7 +86,8 @@ describe("onFetch", () => {
     });
 
     try {
-      await onFetch(onError)("/testing/123", validation);
+      const nookFetch = createNookFetch(onError);
+      await nookFetch("/testing/123", validation);
 
       // fail if the fetch does not error
       expect(true).toBe(false);
@@ -98,7 +104,8 @@ describe("onFetch", () => {
     });
 
     try {
-      await onFetch(onError)("/testing/123", validation, {
+      const nookFetch = createNookFetch(onError);
+      await nookFetch("/testing/123", validation, undefined, {
         useErrorHandling: false
       });
 
@@ -116,7 +123,8 @@ describe("onFetch", () => {
     });
 
     try {
-      await onFetch(onError)("/testing/123", validation, {
+      const nookFetch = createNookFetch(onError);
+      await nookFetch("/testing/123", validation, undefined, {
         useErrorHandling: true
       });
 

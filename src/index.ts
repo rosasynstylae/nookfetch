@@ -1,3 +1,3 @@
-import onFetch from "./onFetch";
+import createNookFetch from "./nookFetch";
 
-export default onFetch;
+export default createNookFetch;
