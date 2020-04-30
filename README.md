@@ -2,6 +2,8 @@
 
 A lightweight, flexible fetch wrapper written during the 2020 quarantine
 
+![Build](https://github.com/rosasynstylae/nookfetch/workflows/Run%20CI/badge.svg)
+
 ## Table of Contents
 
 - [Installation](#Installation)
