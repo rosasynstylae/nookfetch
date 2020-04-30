@@ -22,9 +22,12 @@ nookFetch factory - creates the [`nookFetch`](#nookFetch-function) function and 
 
 #### Arguments
 
-| Name    | Type               | Required | Default | Description                                                   |
-| ------- | ------------------ | -------- | ------- | ------------------------------------------------------------- |
-| onError | (e: Error) => void | true     | -       | callback function on error - could be API or validation error |
+| Name          | Type                  | Required | Default         | Description                                                   |
+| ------------- | --------------------- | -------- | --------------- | ------------------------------------------------------------- |
+| onError       | (e: Error) => void    | true     | -               | callback function on error - could be API or validation error |
+| parseResponse | (e: Response) => void | -        | parseReturnData | general function to parse incoming data                       |
+
+**NOTE:** The default parseResponse value will ONLY parse JSON data - it will return the Response object if the header is not `application/json`.
 
 #### Returns
 
@@ -51,16 +54,14 @@ Fetch wrapper function
 
 This function handles parsing, validation, and error handling for a fetch.
 
-**NOTE:** that this function assumes that the API returns json-serialized data. Currently it does not handle other types of data.
-
 #### Arguments
 
-| Name         | Type              | Required | Default                      | Description                                         |
-| ------------ | ----------------- | -------- | ---------------------------- | --------------------------------------------------- |
-| url          | string            | true     | -                            | the url to call                                     |
-| validate     | (input: any) => T | true     | -                            | function to validate the return data from the fetch |
-| fetchOptions | FetchOptionsType  | -        | -                            | configuration options for the fetch call            |
-| options      | OptionsType       | -        | `{ useErrorHandling: true }` | configuration options                               |
+| Name         | Type              | Required | Default                                   | Description                                         |
+| ------------ | ----------------- | -------- | ----------------------------------------- | --------------------------------------------------- |
+| url          | string            | true     | -                                         | the url to call                                     |
+| validate     | (input: any) => T | true     | -                                         | function to validate the return data from the fetch |
+| fetchOptions | FetchOptionsType  | -        | -                                         | configuration options for the fetch call            |
+| options      | OptionsType       | -        | See `OptionsType` for default information | configuration options                               |
 
 ##### FetchOptionsType
 
@@ -80,9 +81,12 @@ The body type has been changed - nookFetch will process it automatically into a 
 
 The OptionsType is an object with the following properties:
 
-| Name             | Type    | Required | Default | Description                         |
-| ---------------- | ------- | -------- | ------- | ----------------------------------- |
-| useErrorHandling | boolean | -        | true    | toggles use of the onError function |
+| Name             | Type                  | Required | Default         | Description                                               |
+| ---------------- | --------------------- | -------- | --------------- | --------------------------------------------------------- |
+| useErrorHandling | boolean               | -        | true            | toggles use of the onError function                       |
+| parseResponse    | (e: Response) => void | -        | parseReturnData | function to parse incoming data for a specific fetch call |
+
+**NOTE:** The default parseResponse value will ONLY parse JSON data - it will return the Response object if the header is not `application/json`.
 
 #### Returns
 
@@ -122,5 +126,4 @@ try {
 
 ## TODO
 
-- Handle multiple return data types from the API
 - Create custom API error class
