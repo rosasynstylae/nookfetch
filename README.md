@@ -129,3 +129,4 @@ try {
 ## TODO
 
 - Create custom API error class
+- Throw error on API failure
