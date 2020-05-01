@@ -6,11 +6,23 @@ A lightweight, flexible fetch wrapper written during the 2020 quarantine
 
 ## Table of Contents
 
+- [Why](#Why-a-fetch-wrapper)
 - [Installation](#Installation)
 - [Documentation](#Documentation)
   - [createNookFetch](#createNookFetch)
   - [nookFetch](#nookFetch-function)
   - [APIError](#APIError)
+
+## Why a fetch wrapper?
+
+When hitting an endpoint, most developers want to focus on the response data.
+They don't want to have to worry about generalized error handling, Response
+parsing, or response-type validation. This project allows for simple set-up of
+these concerns, while being flexible enough to allow overrides for individual
+calls.
+
+When starting this project, I could not find anything similar already available
+on NPM - so I wrote it myself!
 
 ## Installation
 
