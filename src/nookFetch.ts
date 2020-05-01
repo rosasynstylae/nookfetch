@@ -1,36 +1,41 @@
 import { getBody, parseReturnData } from "./helpers";
+import APIError from "./APIError";
 
 type FetchOptionsType = Omit<RequestInit, "body"> & {
   body?: object | FormData;
 };
 
-interface OptionsType {
-  /** if set to false, the onError function will not be called - default: true */
-  useErrorHandling?: boolean;
+interface ParseOptionsType {
   // we can use any here because this is parsing the response - not checking type
   /* eslint-disable @typescript-eslint/no-explicit-any */
   /** parse function for this specific call */
   parseResponse?: (response: Response) => Promise<any>;
   /* eslint-enable @typescript-eslint/no-explicit-any */
+  /** parse error message for this specific call */
+  parseErrorResponse?: (respone: Response) => Promise<string>;
+}
+
+interface OptionsType extends ParseOptionsType {
+  /** if set to false, the onError function will not be called - default: true */
+  useErrorHandling?: boolean;
 }
 
 /**
  * nookFetch factory
  *
  * @param onError callback function on api error
- * @param parseResponse general function to parse incoming data
+ * @param generalOptions general settings for the fetch
  *
  * @note parsing will default using a built-in parser that ONLY handles JSON
  *       data if neither parseResponse is set
+ * @note error message parsing will NOT be done if a parseErrorResponse function
+ *       is not passed
  *
  * @return the nookFetch function
  */
 const createNookFetch = (
   onError: (e: Error) => void,
-  // we can use any here because this is parsing the response - not checking type
-  /* eslint-disable @typescript-eslint/no-explicit-any */
-  parseResponse?: (response: Response) => Promise<any>
-  /* eslint-enable @typescript-eslint/no-explicit-any */
+  generalOptions?: ParseOptionsType
 ): (<T>(
   url: string,
   // we can accept any here because this is validating the input
@@ -38,7 +43,8 @@ const createNookFetch = (
   fetchOptions?: FetchOptionsType,
   options?: OptionsType
 ) => Promise<T>) => {
-  const parse = parseResponse || parseReturnData;
+  const { parseResponse: parse = parseReturnData, parseErrorResponse } =
+    generalOptions || {};
 
   /**
    * Fetch wrapper function
@@ -51,7 +57,7 @@ const createNookFetch = (
    * @param fetchOptions - configuration options for the fetch call
    * @param options - configuration options
    *
-   * @throws either api or validation error
+   * @throws api, parsing, or validation errors
    *
    * @return the validated data
    */
@@ -62,17 +68,26 @@ const createNookFetch = (
     fetchOptions?: FetchOptionsType,
     options?: OptionsType
   ): Promise<T> => {
-    const { useErrorHandling = true, parseResponse: parseResponseData } =
-      options || {};
+    const {
+      useErrorHandling = true,
+      parseResponse: parseResponseData = parse,
+      parseErrorResponse: parseErrorMessage = parseErrorResponse
+    } = options || {};
     const { body: data } = fetchOptions || {};
-
-    const parseData = parseResponseData || parse;
 
     try {
       const body = data ? getBody(data) : undefined;
 
       const returnVal = await fetch(url, { ...fetchOptions, body });
-      const value = await parseData(returnVal);
+
+      if (returnVal.status > 299 || returnVal.status < 200) {
+        const errorMessage = parseErrorMessage
+          ? await parseErrorMessage(returnVal)
+          : "API Error";
+        throw new APIError(errorMessage, returnVal.status);
+      }
+
+      const value = await parseResponseData(returnVal);
 
       return validate(value);
     } catch (e) {

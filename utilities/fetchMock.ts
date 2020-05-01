@@ -7,9 +7,17 @@ const fetchSpy = jest.fn(async url => {
     return new Response(JSON.stringify({ foo: "bar" }), {
       headers: { "Content-Type": "application/json" }
     });
-  } else if (url === "/test/empty") {
+  }
+
+  if (url === "/test/empty") {
     return new Response(null, {
       status: 204
+    });
+  }
+
+  if (url === "/test/error") {
+    return new Response(JSON.stringify({ message: "It broke!" }), {
+      status: 500
     });
   }
 });

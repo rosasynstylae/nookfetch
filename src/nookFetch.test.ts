@@ -9,6 +9,7 @@ jest.mock("./helpers", () => {
 });
 
 import { parseReturnData } from "./helpers";
+import APIError from "./APIError";
 import createNookFetch from "./nookFetch";
 
 const validation = (data: any): { data: { foo: string }; errors: string[] } => {
@@ -145,6 +146,24 @@ describe("createNookFetch", () => {
     }
   });
 
+  it("should throw error if validation throws an error", async () => {
+    const onError = jest.fn();
+    const validateFunc = jest.fn().mockImplementationOnce(() => {
+      throw new Error("Rawr!");
+    });
+
+    try {
+      const nookFetch = createNookFetch(onError);
+      await nookFetch("/testing/123", validateFunc);
+
+      // fail if the fetch does not error
+      expect(true).toBe(false);
+    } catch (e) {
+      expect(onError).toHaveBeenCalledTimes(1);
+      expect(onError).toHaveBeenNthCalledWith(1, e);
+    }
+  });
+
   it("should use default parser if no parser is passed", async () => {
     const nookFetch = createNookFetch(jest.fn());
 
@@ -158,7 +177,9 @@ describe("createNookFetch", () => {
 
   it("should use general parser if no specific parser is passed", async () => {
     const generalParser = jest.fn(val => val);
-    const nookFetch = createNookFetch(jest.fn(), generalParser);
+    const nookFetch = createNookFetch(jest.fn(), {
+      parseResponse: generalParser
+    });
 
     await nookFetch(
       "/test/empty",
@@ -190,7 +211,9 @@ describe("createNookFetch", () => {
     const generalParser = jest.fn(val => val);
     const specificParser = jest.fn(val => val);
 
-    const nookFetch = createNookFetch(jest.fn(), generalParser);
+    const nookFetch = createNookFetch(jest.fn(), {
+      parseResponse: generalParser
+    });
 
     await nookFetch(
       "/test/empty",
@@ -204,5 +227,85 @@ describe("createNookFetch", () => {
     expect(parseReturnData).toHaveBeenCalledTimes(0);
     expect(generalParser).toHaveBeenCalledTimes(0);
     expect(specificParser).toHaveBeenCalledTimes(1);
+  });
+
+  it("should throw error if status is not in the 200 range", async () => {
+    const nookFetch = createNookFetch(jest.fn());
+
+    try {
+      await nookFetch(
+        "/test/error",
+        jest.fn(a => a)
+      );
+
+      expect(true).toBe(false);
+    } catch (e) {
+      expect(e).toBeInstanceOf(APIError);
+      expect(e.message).toBe("API Error");
+      expect(e.getStatus()).toBe(500);
+    }
+  });
+
+  it("should parse error message if general error parser is passed", async () => {
+    const generalParser = jest.fn(async val => (await val.json()).message);
+
+    const nookFetch = createNookFetch(jest.fn(), {
+      parseErrorResponse: generalParser
+    });
+
+    try {
+      await nookFetch(
+        "/test/error",
+        jest.fn(a => a)
+      );
+
+      expect(true).toBe(false);
+    } catch (e) {
+      expect(generalParser).toHaveBeenCalledTimes(1);
+      expect(e.message).toBe("It broke!");
+    }
+  });
+
+  it("should parse error message if specific error parser is passed", async () => {
+    const specificParser = jest.fn(async val => (await val.json()).message);
+
+    const nookFetch = createNookFetch(jest.fn());
+
+    try {
+      await nookFetch(
+        "/test/error",
+        jest.fn(a => a),
+        undefined,
+        { parseErrorResponse: specificParser }
+      );
+
+      expect(true).toBe(false);
+    } catch (e) {
+      expect(specificParser).toHaveBeenCalledTimes(1);
+      expect(e.message).toBe("It broke!");
+    }
+  });
+
+  it("should parse error message with specific error parser even if general error parser is passed", async () => {
+    const specificParser = jest.fn(async val => (await val.json()).message);
+    const generalParser = jest.fn(async val => (await val.json()).message);
+
+    const nookFetch = createNookFetch(jest.fn(), {
+      parseErrorResponse: generalParser
+    });
+
+    try {
+      await nookFetch(
+        "/test/error",
+        jest.fn(a => a),
+        undefined,
+        { parseErrorResponse: specificParser }
+      );
+
+      expect(true).toBe(false);
+    } catch (e) {
+      expect(specificParser).toHaveBeenCalledTimes(1);
+      expect(e.message).toBe("It broke!");
+    }
   });
 });
