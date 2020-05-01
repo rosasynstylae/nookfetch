@@ -8,7 +8,9 @@ A lightweight, flexible fetch wrapper written during the 2020 quarantine
 
 - [Installation](#Installation)
 - [Documentation](#Documentation)
-- [TODO](#TODO)
+  - [createNookFetch](#createNookFetch)
+  - [nookFetch](#nookFetch-function)
+  - [APIError](#APIError)
 
 ## Installation
 
@@ -24,10 +26,19 @@ nookFetch factory - creates the [`nookFetch`](#nookFetch-function) function and 
 
 #### Arguments
 
-| Name          | Type                  | Required | Default         | Description                                                   |
-| ------------- | --------------------- | -------- | --------------- | ------------------------------------------------------------- |
-| onError       | (e: Error) => void    | true     | -               | callback function on error - could be API or validation error |
-| parseResponse | (e: Response) => void | -        | parseReturnData | general function to parse incoming data                       |
+| Name           | Type               | Required | Default                                        | Description                                                   |
+| -------------- | ------------------ | -------- | ---------------------------------------------- | ------------------------------------------------------------- |
+| onError        | (e: Error) => void | true     | -                                              | callback function on error - could be API or validation error |
+| generalOptions | ParseOptionsType   | -        | See `ParseOptionsType` for default information | general settings for fetch functions                          |
+
+##### ParseOptionsType
+
+The ParseOptionsType is an object with the following properties:
+
+| Name               | Type                  | Required | Default         | Description                                               |
+| ------------------ | --------------------- | -------- | --------------- | --------------------------------------------------------- |
+| parseResponse      | (e: Response) => void | -        | parseReturnData | function to parse incoming data for a specific fetch call |
+| parseErrorResponse | boolean               | -        | -               | function to parse error message for this specific call    |
 
 **NOTE:** The default parseResponse value will ONLY parse JSON data - it will return the Response object if the header is not `application/json`.
 
@@ -77,16 +88,17 @@ type FetchOptionsType = Omit<RequestInit, "body"> & {
 
 You can pass any options available to the fetch function.
 
-The body type has been changed - nookFetch will process it automatically into a type the fetch function can consume.
+**NOTE:** The body type has been changed - nookFetch will process it automatically into a type the fetch function can consume.
 
 ##### OptionsType
 
 The OptionsType is an object with the following properties:
 
-| Name             | Type                  | Required | Default         | Description                                               |
-| ---------------- | --------------------- | -------- | --------------- | --------------------------------------------------------- |
-| useErrorHandling | boolean               | -        | true            | toggles use of the onError function                       |
-| parseResponse    | (e: Response) => void | -        | parseReturnData | function to parse incoming data for a specific fetch call |
+| Name               | Type                  | Required | Default                                           | Description                                                       |
+| ------------------ | --------------------- | -------- | ------------------------------------------------- | ----------------------------------------------------------------- |
+| useErrorHandling   | boolean               | -        | true                                              | toggles use of the onError function                               |
+| parseResponse      | (e: Response) => void | -        | `parseReturnData` OR the general parsing function | function to parse incoming data for a specific fetch call, if set |
+| parseErrorResponse | boolean               | -        | the general error parsing function, if set        | function to parse error message for this specific call            |
 
 **NOTE:** The default parseResponse value will ONLY parse JSON data - it will return the Response object if the header is not `application/json`.
 
@@ -98,12 +110,16 @@ A promise that resolves to the output of the validation function.
 
 ##### API Error
 
-- Could be parsing error
-- Could be error raised by fetch
+- Error thrown by fetch
+- Error thrown when api status is not in the 200 range
 
 ##### Validation Error
 
 - Error thrown by validate function
+
+##### Parsing Error
+
+- Error thrown by the parsing function
 
 #### Usage
 
@@ -126,7 +142,23 @@ try {
 }
 ```
 
-## TODO
+### APIError
 
-- Create custom API error class
-- Throw error on API failure
+Class representing an API Error
+
+#### Arguments
+
+| Name    | Type   | Required | Default | Description         |
+| ------- | ------ | -------- | ------- | ------------------- |
+| message | string | true     | -       | the error message   |
+| status  | number | true     | -       | the api status code |
+
+#### Functions
+
+##### getStatus
+
+Function to get the status code of the API error.
+
+###### Returns
+
+Number that represents the API error code.
